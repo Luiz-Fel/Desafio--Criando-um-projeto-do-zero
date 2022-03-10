@@ -1,13 +1,32 @@
 :root {
   --background: #1A1D23;
+  --title: #F8F8F8;
+  --sub-title: #D7D7D7;
+  --pink: #FF57B2;
 
 }
 
+h1, h2, h3, h4, h5, h6, a , p {
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color : var(--title)
+}
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+a {
+  display: block;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
 }
 
 // TODO

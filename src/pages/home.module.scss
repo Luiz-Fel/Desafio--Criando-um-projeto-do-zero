@@ -1,1 +1,46 @@
-// TODO
+.main {
+
+    padding-left: 23.25rem;
+    padding-right: 23.25rem;
+}
+
+.post {
+        color: green;
+        margin-bottom: 2rem;
+}
+   
+.post:last-of-type {
+    margin-bottom: 0rem;
+}
+
+.title {
+    margin-bottom: 0.5rem;
+}
+.subTitle {
+    padding-bottom: 1.5rem;
+    color: var(--sub-title)
+}
+
+.dateAndAuthor {
+    display: flex;
+    gap: 1.5rem;
+    color: var(--sub-title)
+
+}
+.postSubContent {
+    gap: 0.5rem;
+    display: flex;
+}
+
+.button {
+    background-color: transparent;
+    border: transparent;
+    margin-top: 4rem;
+    margin-bottom: 5rem;
+    font-size:1.125rem;
+    font-weight: bold;
+    color: var(--pink);
+    &:hover {
+        text-decoration: underline;
+    }
+}
