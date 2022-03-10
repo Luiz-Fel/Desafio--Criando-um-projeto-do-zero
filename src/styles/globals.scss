@@ -1,3 +1,9 @@
+:root {
+  --background: #1A1D23;
+
+}
+
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,3 +11,7 @@
 }
 
 // TODO
+
+body {
+  background: var(--background)
+}
