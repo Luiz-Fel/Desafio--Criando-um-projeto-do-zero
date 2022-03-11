@@ -29,7 +29,23 @@ interface HomeProps {
 }
 
 export default function Home(props) {
- 
+  const [posts, setPosts] = useState(props.posts.results)
+  const [nextPosts, setNextPosts] = useState(props.posts.next_page)
+
+  async function addPosts() {
+    if (nextPosts !== null) {
+
+      await fetch(nextPosts, {method: 'GET'}).then(
+        (response) => response.json())
+        .then(
+          (response) => {
+
+            setPosts([...posts, ...response.results])
+            setNextPosts(response.next_page)
+          }
+          )
+      }
+  }
 
   console.log(posts) 
   return(
