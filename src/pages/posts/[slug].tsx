@@ -5,6 +5,7 @@ import Prismic from '@prismicio/client'
 import { useRouter } from 'next/router';
 import ptBR from 'date-fns/locale/pt-BR';
 import { format } from 'date-fns';
+import { FiClock, FiUser, FiCalendar } from "react-icons/fi";
 
 
 
@@ -18,6 +19,7 @@ interface Post {
   data: {
     createdAt: string | null;
     title: string;
+    timeToRead: number;
     banner: {
       url: string;
     };
@@ -43,12 +45,18 @@ export default function Post({ post } : PostProps) {
     <>
       <img src="" alt="" />
       <div className={styles.main}>
-        <h1>{data.title}</h1>
-        <div>
-          ícone {createdAt}
+        <h1 className={styles.title}>{data.title}</h1>
+        <div className={styles.subTitle}>
+          <div className={styles.subTitleContainer}>
+            <FiCalendar /> {createdAt}
+          </div>
+          <div className={styles.subTitleContainer}>
+            <FiUser /> {data.author}
+          </div>
+          <div className={styles.subTitleContainer}>
+            <FiClock /> {`${data.timeToRead} min `}
+          </div>
         </div>
-        <div>ícone {data.author}</div>
-        <div>ícone {`${'tempo'} min `}</div>
         <div dangerouslySetInnerHTML={{__html: String(data.content)}} />
       </div>
     </>
@@ -78,6 +86,11 @@ export const getStaticPaths = async () => {
 export const getStaticProps = async ({params}) => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('posts', params.slug, {});
+  const timeToRead = (Math.ceil(
+    response.data.content[0].body.reduce((pre, cur) => 
+      cur.text.split(/[,.\s]/).length + pre, 0)
+       / 200))
+    console.log(timeToRead)
   // TODO
   const post = {
     data: {
@@ -86,6 +99,7 @@ export const getStaticProps = async ({params}) => {
       content: RichText.asHtml(response.data.content[0].body),
       author: RichText.asText(response.data.author),
       createdAt: response.first_publication_date,
+      timeToRead: timeToRead,
     }
     
   }
