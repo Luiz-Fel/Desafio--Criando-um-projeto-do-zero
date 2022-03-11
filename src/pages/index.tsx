@@ -47,19 +47,18 @@ export default function Home(props) {
       }
   }
 
-  console.log(posts) 
   return(
     <div className={styles.main}>
 
       {posts.map((current) => {
         return(
           <div key={current.uid} className={styles.post}>
-            <Link href={'/'}>
+            <Link href={`/posts/${current.uid}`}>
               <a className={styles.title}>
                 <h2>{current.data.title[0].text}</h2>
               </a>
             </Link>
-            <Link href={'/'}>
+            <Link href={`/posts/${current.uid}`}>
               <a className={styles.subTitle}>
                 <p>{current.data.subtitle[0].text}</p>
               </a>
@@ -101,7 +100,6 @@ export const getStaticProps = async () => {
      fetch: ['Post.Title', 'Post.Content'],
      pageSize: 5
    });
-   console.log(postsResponse)
 
   // TODO
   return {

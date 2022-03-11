@@ -8,7 +8,7 @@ export default function Header() {
 
       <Link href={'/'}>
         <a >
-          <img src="Logo.svg" alt="logo" />
+          <img src={"/" + "Logo.svg"} alt="logo" />
         </a>
       </Link>
     </div>
