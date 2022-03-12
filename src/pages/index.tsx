@@ -3,7 +3,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 import { format } from 'date-fns';
 import { getPrismicClient } from '../services/prismic';
 import Prismic from '@prismicio/client'
-
+import { FiCalendar, FiUser } from "react-icons/fi";
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import Link from 'next/link';
@@ -29,13 +29,13 @@ interface HomeProps {
 }
 
 export default function Home(props) {
-  const [posts, setPosts] = useState(props.posts.results)
-  const [nextPosts, setNextPosts] = useState(props.posts.next_page)
+  const [posts, setPosts] = useState(props.results)
+  const [nextPosts, setNextPosts] = useState()
+
+
 
   async function addPosts() {
-    if (nextPosts !== null) {
-
-      await fetch(nextPosts, {method: 'GET'}).then(
+      await fetch(props.next_page, {method: 'GET'}).then(
         (response) => response.json())
         .then(
           (response) => {
@@ -44,40 +44,49 @@ export default function Home(props) {
             setNextPosts(response.next_page)
           }
           )
-      }
   }
-
+  
+  
+  console.log(props)
   return(
     <div className={styles.main}>
 
-      {posts.map((current) => {
+      {props.results.map((post : any) => {
+        const time = new Date(post.data.date)
         return(
-          <div key={current.uid} className={styles.post}>
-            <Link href={`/posts/${current.uid}`}>
+          <div key={post.uid} className={styles.post}>
+            <Link href={`/posts/${post.uid}`}>
               <a className={styles.title}>
-                <h2>{current.data.title[0].text}</h2>
+                <h2>{post.data.title[0].text}</h2>
               </a>
             </Link>
-            <Link href={`/posts/${current.uid}`}>
+            <Link href={`/posts/${post.uid}`}>
               <a className={styles.subTitle}>
-                <p>{current.data.subtitle[0].text}</p>
+                <p>{post.data.subtitle[0].text}</p>
               </a>
             </Link>
             <div className={styles.dateAndAuthor}>
               <div className={styles.postSubContent}>
-              <p>ícone</p>
+              <FiCalendar />
               <p>
                 {
-                format(new Date(Date.parse(current.first_publication_date)), 
-                      'dd MMM yyyy', {locale: ptBR})
+
+                 format(
+                   time,
+                   "dd MMM yyyy",
+                   {
+                     locale: ptBR,
+                   }
+                 )
+
                 }
                 </p>
               </div>
               <div className={styles.postSubContent}>
-              <p>ícone</p>
+              <FiUser />
                 <p>
                 {
-                  current.data.author[0].text
+                  post.data.author[0].text
                 }
                 </p>
               </div>
@@ -85,9 +94,13 @@ export default function Home(props) {
           </div>
         )
       })}
-      <button className={styles.button} onClick={() => addPosts()}>
+      {
+        (nextPosts !== null)
+        &&
+        <button className={styles.button} onClick={() => addPosts()}>
         Carregar mais posts
-      </button>
+       </button>
+      }
     </div>
   )
 }
@@ -104,7 +117,7 @@ export const getStaticProps = async () => {
   // TODO
   return {
     props: {
-      posts: postsResponse
+      ...postsResponse
     }
   }
 };

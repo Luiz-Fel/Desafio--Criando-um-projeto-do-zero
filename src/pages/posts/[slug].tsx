@@ -37,18 +37,20 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post({ post } : PostProps) {
-  const data = post.data
-  const createdAt = format(new Date(Date.parse(post.data.createdAt)), 
-  'dd MMM yyyy', {locale: ptBR})
+interface ResponseProps{}
+
+export default function Post(props) {
+  const data = props.response
+ //  const createdAt = format(new Date(Date.parse(response.frist_date)), 
+ //     'dd MMM yyyy', {locale: ptBR})
   return(
     <>
       <img src="" alt="" />
       <div className={styles.main}>
-        <h1 className={styles.title}>{data.title}</h1>
+        <h1 className={styles.title[0]}>{data.title}</h1>
         <div className={styles.subTitle}>
           <div className={styles.subTitleContainer}>
-            <FiCalendar /> {createdAt}
+            <FiCalendar /> {data.createdAt}
           </div>
           <div className={styles.subTitleContainer}>
             <FiUser /> {data.author}
@@ -90,22 +92,10 @@ export const getStaticProps = async ({params}) => {
     response.data.content[0].body.reduce((pre, cur) => 
       cur.text.split(/[,.\s]/).length + pre, 0)
        / 200))
-    console.log(timeToRead)
-  // TODO
-  const post = {
-    data: {
-      
-      title: RichText.asText(response.data.title),
-      content: RichText.asHtml(response.data.content[0].body),
-      author: RichText.asText(response.data.author),
-      createdAt: response.first_publication_date,
-      timeToRead: timeToRead,
-    }
-    
-  }
+  
   return { 
     props: {
-      post: post
+      response
     }
   }
 };
