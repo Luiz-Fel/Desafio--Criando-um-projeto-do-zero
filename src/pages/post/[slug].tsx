@@ -38,16 +38,18 @@ interface PostProps {
 
 export default function Post({ post } : PostProps) {
   const data = post.data
+
   const timeToRead = (Math.ceil(
     post.data.content[0].body.reduce((pre, cur) => 
       cur.text.split(/[,.\s]/).length + pre, 0)
        / 200))
-   const createdAt = new Date(post.first_publication_date)
+
+  const createdAt = new Date(post.first_publication_date)
   return(
     <>
       <img src="" alt="" />
       <div className={styles.main}>
-        <h1 className={styles.title[0]}>{data.title}</h1>
+        <h1 className={styles.title}>{data.title}</h1>
         <div className={styles.subTitle}>
           <div className={styles.subTitleContainer}>
             <FiCalendar /> {createdAt}
@@ -59,7 +61,9 @@ export default function Post({ post } : PostProps) {
             <FiClock /> {`${timeToRead} min `}
           </div>
         </div>
-        <div dangerouslySetInnerHTML={{__html: String(data.content)}} />
+        <div>
+          {RichText.asText(data.content)}
+        </div>
       </div>
     </>
   )

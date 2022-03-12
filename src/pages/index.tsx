@@ -8,6 +8,7 @@ import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Console } from 'console';
 
 
 interface Post {
@@ -31,37 +32,39 @@ interface HomeProps {
 
 export default function Home(props : HomeProps) {
   const [posts, setPosts] = useState(props.postsPagination.results)
-  const [nextPosts, setNextPosts] = useState()
+  const [nextPosts, setNextPosts] = useState(props.postsPagination.next_page)
 
 
 
   async function addPosts() {
-      await fetch(props.postsPagination.next_page, {method: 'GET'}).then(
+      await fetch(nextPosts, {method: 'GET'}).then(
         (response) => response.json())
         .then(
           (response) => {
-
+            console.log(response)
+            console.log([...posts, ...response.results])
             setPosts([...posts, ...response.results])
             setNextPosts(response.next_page)
           }
           )
+          console.log(posts)
+          
   }
   
   
-  console.log(props)
-  return(
-    <div className={styles.main}>
+    return(
+      <>
+      {posts.map((post) => {
 
-      {props.postsPagination.results.map((post) => {
         const time = new Date(post.first_publication_date)
         return(
-          <div key={post.uid} className={styles.post}>
-            <Link href={`/post/${post.uid}`}>
-              <a className={styles.title}>
-                <div>
-
-                <h2>{post.data.title}</h2>
-                <p className={styles.subTitle}>{post.data.subtitle}</p>
+            <Link key={post.uid} href={`/post/${post.uid}`}>
+              <a key={post.uid} className={styles.title}>
+                
+                <strong>
+                  {post.data.title}
+                  </strong>
+                   <p className={styles.subTitle}>{post.data.subtitle}</p>
                   <div className={styles.postSubContent}>
                   <FiCalendar />
                   <p>
@@ -86,21 +89,23 @@ export default function Home(props : HomeProps) {
                     }
                     </p>
                   </div>
-                </div>
-              </a>
+                </a>
             </Link>
-          </div>
         )
       })}
       {
         (nextPosts !== null)
+
         &&
+
         <button className={styles.button} onClick={() => addPosts()}>
         Carregar mais posts
        </button>
-      }
-    </div>
+        }
+      </>
   )
+
+  
 }
 
 export const getStaticProps = async () => {
@@ -109,7 +114,7 @@ export const getStaticProps = async () => {
    ([ Prismic.Predicates.at('document.type', 'posts')],
    {
      fetch: ['Post.Title', 'Post.Content'],
-     pageSize: 5
+     pageSize: 1
    });
 
   // TODO
