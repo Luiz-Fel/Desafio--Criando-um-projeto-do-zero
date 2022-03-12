@@ -16,10 +16,9 @@ import { RichText } from 'prismic-dom';
 import { title } from 'process';
 
 interface Post {
+  first_publication_date: string | null;
   data: {
-    createdAt: string | null;
     title: string;
-    timeToRead: number;
     banner: {
       url: string;
     };
@@ -37,12 +36,13 @@ interface PostProps {
   post: Post;
 }
 
-interface ResponseProps{}
-
-export default function Post(props) {
-  const data = props.response
- //  const createdAt = format(new Date(Date.parse(response.frist_date)), 
- //     'dd MMM yyyy', {locale: ptBR})
+export default function Post({ post } : PostProps) {
+  const data = post.data
+  const timeToRead = (Math.ceil(
+    post.data.content[0].body.reduce((pre, cur) => 
+      cur.text.split(/[,.\s]/).length + pre, 0)
+       / 200))
+   const createdAt = new Date(post.first_publication_date)
   return(
     <>
       <img src="" alt="" />
@@ -50,13 +50,13 @@ export default function Post(props) {
         <h1 className={styles.title[0]}>{data.title}</h1>
         <div className={styles.subTitle}>
           <div className={styles.subTitleContainer}>
-            <FiCalendar /> {data.createdAt}
+            <FiCalendar /> {createdAt}
           </div>
           <div className={styles.subTitleContainer}>
             <FiUser /> {data.author}
           </div>
           <div className={styles.subTitleContainer}>
-            <FiClock /> {`${data.timeToRead} min `}
+            <FiClock /> {`${timeToRead} min `}
           </div>
         </div>
         <div dangerouslySetInnerHTML={{__html: String(data.content)}} />
@@ -87,15 +87,12 @@ export const getStaticPaths = async () => {
 
 export const getStaticProps = async ({params}) => {
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('posts', params.slug, {});
-  const timeToRead = (Math.ceil(
-    response.data.content[0].body.reduce((pre, cur) => 
-      cur.text.split(/[,.\s]/).length + pre, 0)
-       / 200))
+  const post = await prismic.getByUID('posts', params.slug, {});
+  
   
   return { 
     props: {
-      response
+      post,
     }
   }
 };

@@ -9,6 +9,7 @@ import styles from './home.module.scss';
 import Link from 'next/link';
 import { useState } from 'react';
 
+
 interface Post {
   uid?: string;
   first_publication_date: string | null;
@@ -28,14 +29,14 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home(props) {
-  const [posts, setPosts] = useState(props.results)
+export default function Home(props : HomeProps) {
+  const [posts, setPosts] = useState(props.postsPagination.results)
   const [nextPosts, setNextPosts] = useState()
 
 
 
   async function addPosts() {
-      await fetch(props.next_page, {method: 'GET'}).then(
+      await fetch(props.postsPagination.next_page, {method: 'GET'}).then(
         (response) => response.json())
         .then(
           (response) => {
@@ -51,46 +52,43 @@ export default function Home(props) {
   return(
     <div className={styles.main}>
 
-      {props.results.map((post : any) => {
-        const time = new Date(post.data.date)
+      {props.postsPagination.results.map((post) => {
+        const time = new Date(post.first_publication_date)
         return(
           <div key={post.uid} className={styles.post}>
-            <Link href={`/posts/${post.uid}`}>
+            <Link href={`/post/${post.uid}`}>
               <a className={styles.title}>
-                <h2>{post.data.title[0].text}</h2>
+                <div>
+
+                <h2>{post.data.title}</h2>
+                <p className={styles.subTitle}>{post.data.subtitle}</p>
+                  <div className={styles.postSubContent}>
+                  <FiCalendar />
+                  <p>
+                    {
+                      
+                      format(
+                        time,
+                        "dd MMM yyyy",
+                        {
+                          locale: ptBR,
+                        }
+                        )
+                        
+                      }
+                    </p>
+                  </div>
+                  <div className={styles.postSubContent}>
+                  <FiUser />
+                    <p>
+                    {
+                      post.data.author
+                    }
+                    </p>
+                  </div>
+                </div>
               </a>
             </Link>
-            <Link href={`/posts/${post.uid}`}>
-              <a className={styles.subTitle}>
-                <p>{post.data.subtitle[0].text}</p>
-              </a>
-            </Link>
-            <div className={styles.dateAndAuthor}>
-              <div className={styles.postSubContent}>
-              <FiCalendar />
-              <p>
-                {
-
-                 format(
-                   time,
-                   "dd MMM yyyy",
-                   {
-                     locale: ptBR,
-                   }
-                 )
-
-                }
-                </p>
-              </div>
-              <div className={styles.postSubContent}>
-              <FiUser />
-                <p>
-                {
-                  post.data.author[0].text
-                }
-                </p>
-              </div>
-            </div>
           </div>
         )
       })}
@@ -117,7 +115,12 @@ export const getStaticProps = async () => {
   // TODO
   return {
     props: {
-      ...postsResponse
-    }
+      postsPagination:{
+        results: postsResponse.results,
+        next_page: postsResponse.next_page
+      } 
+        
+    },
+    revalidate: 60 * 30,
   }
 };
