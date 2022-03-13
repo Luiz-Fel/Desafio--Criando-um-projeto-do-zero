@@ -12,8 +12,8 @@ import { FiClock, FiUser, FiCalendar } from "react-icons/fi";
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import router from 'next/router';
-import { RichText } from 'prismic-dom';
 import { title } from 'process';
+import { RichText } from 'prismic-dom';
 
 interface Post {
   first_publication_date: string | null;
@@ -37,22 +37,45 @@ interface PostProps {
 }
 
 export default function Post({ post } : PostProps) {
+  const postRouter = useRouter()
+  if (postRouter.isFallback) {
+    return (
+      <h1>Carregando...</h1>
+    )
+  }
+
   const data = post.data
+  const content =  data.content.map((cur) => {
+    return RichText.asText(cur.body)
+  })
+ 
+  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA')
 
-  const timeToRead = (Math.ceil(
-    post.data.content[0].body.reduce((pre, cur) => 
-      cur.text.split(/[,.\s]/).length + pre, 0)
-       / 200))
+  const timeToRead = (Math.ceil(content.reduce((acc, cur,) => {
+    
+    const lentgtOfText = cur.split(/[,.\s]/).length
+    return acc + lentgtOfText
+  }, 0) / 200))
+  const createdAt =  format(
+    new Date(post.first_publication_date),
+    "dd MMM yyyy",
+    {
+      locale: ptBR,
+    }
+    )
+  
 
-  const createdAt = new Date(post.first_publication_date)
+
+
   return(
     <>
-      <img src="" alt="" />
+      <img src={data.banner.url} alt="" />
       <div className={styles.main}>
         <h1 className={styles.title}>{data.title}</h1>
         <div className={styles.subTitle}>
           <div className={styles.subTitleContainer}>
-            <FiCalendar /> {createdAt}
+            <FiCalendar /> 
+            <span>{createdAt}</span>
           </div>
           <div className={styles.subTitleContainer}>
             <FiUser /> {data.author}
@@ -62,7 +85,11 @@ export default function Post({ post } : PostProps) {
           </div>
         </div>
         <div>
-          {RichText.asText(data.content)}
+          {content.map((text) => {
+            return(
+              <p key={content.indexOf(text)}>{text}</p>
+            )
+          })}
         </div>
       </div>
     </>
@@ -83,7 +110,7 @@ export const getStaticPaths = async () => {
     paths: postsResponse.results.map((current) => { 
       return { params: { slug : current.uid } }
     }),
-    fallback: false,
+    fallback: true,
   }
 };
 

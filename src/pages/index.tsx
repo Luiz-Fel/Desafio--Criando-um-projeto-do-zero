@@ -41,13 +41,11 @@ export default function Home(props : HomeProps) {
         (response) => response.json())
         .then(
           (response) => {
-            console.log(response)
-            console.log([...posts, ...response.results])
+
             setPosts([...posts, ...response.results])
             setNextPosts(response.next_page)
           }
           )
-          console.log(posts)
           
   }
   
