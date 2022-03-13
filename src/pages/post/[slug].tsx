@@ -46,14 +46,17 @@ export default function Post({ post } : PostProps) {
 
   const data = post.data
   const content =  data.content.map((cur) => {
-    return RichText.asText(cur.body)
+    return {
+      heading: cur.heading,
+      body: RichText.asText(cur.body)
+    }
   })
  
   console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA')
-
+  console.log(data.content)
   const timeToRead = (Math.ceil(content.reduce((acc, cur,) => {
     
-    const lentgtOfText = cur.split(/[,.\s]/).length
+    const lentgtOfText = cur.body.split(/[,.\s]/).length
     return acc + lentgtOfText
   }, 0) / 200))
   const createdAt =  format(
@@ -86,8 +89,13 @@ export default function Post({ post } : PostProps) {
         </div>
         <div>
           {content.map((text) => {
+            console.log(text)
             return(
-              <p key={content.indexOf(text)}>{text}</p>
+              <div key={content.indexOf(text)}>
+
+              <h3>{text.heading}</h3>
+              <p>{text.body}</p>
+              </div>
             )
           })}
         </div>
